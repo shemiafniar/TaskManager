@@ -8,9 +8,9 @@ class Task {
     this.priority = priority;
     this.status = status;
     this.createdBy = createdBy;
-    this.createdAt = new Date().toLocaleString();
+    this.createdAt = new Date().toISOString();
     this.lastUpdatedBy = createdBy;
-    this.lastUpdatedAt = this.createdAt;
+    this.lastUpdatedAt = new Date().toLocaleString();
     this.tags = tags;
     this.dueDate = dueDate;
   }
@@ -18,6 +18,7 @@ class Task {
 
 let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 let editingTaskId = null;
+let tasksToShow = 10; // מספר המשימות המוצגות כברירת מחדל
 
 // אלמנטים
 const tasksDiv = document.getElementById('tasks');
@@ -38,8 +39,12 @@ const createdByInput = document.getElementById('createdBy');
 const tagsInput = document.getElementById('tags');
 const dueDateInput = document.getElementById('dueDate');
 
-// --- פונקציות ---
+const statusFilter = document.getElementById('statusFilter');
+const priorityFilter = document.getElementById('priorityFilter');
+const sortBySelect = document.getElementById('sortBy');
+const showMoreBtn = document.getElementById('showMoreTasks');
 
+// --- Modal ---
 function openModal(editTask = null) {
   modal.style.display = 'block';
   if(editTask){
@@ -68,6 +73,7 @@ openFormBtn.onclick = () => openModal();
 closeModalBtn.onclick = () => closeModal();
 window.onclick = e => { if(e.target == modal) closeModal(); }
 
+// --- שמירת משימה ---
 function saveTask() {
   const title = titleInput.value.trim();
   const description = descInput.value.trim();
@@ -95,8 +101,7 @@ function saveTask() {
       return t;
     });
   } else {
-    const newTask = new Task(title, description, priority, status, createdBy, tags, dueDate);
-    tasks.push(newTask);
+    tasks.push(new Task(title, description, priority, status, createdBy, tags, dueDate));
   }
 
   localStorage.setItem('tasks', JSON.stringify(tasks));
@@ -106,58 +111,83 @@ function saveTask() {
 
 saveTaskBtn.onclick = saveTask;
 
+// --- יצירת כרטיס ---
+function createTaskCard(task){
+  const card = document.createElement('div');
+  card.classList.add('task-card');
+
+  let color = '#66cc66';
+  if(task.priority == 2) color = '#ffcc00';
+  else if(task.priority == 3) color = '#ff4d4d';
+
+  card.innerHTML = `
+    <div class="task-info">
+      <p class="task-title">${task.title}</p>
+      <p class="task-meta">עדכון אחרון: ${task.lastUpdatedBy} · ${task.lastUpdatedAt}</p>
+      <p class="task-meta">תאריך יעד: ${task.dueDate || '-'}</p>
+    </div>
+    <div>
+      <span class="priority-indicator" style="background:${color}"></span>
+      <button onclick="editTask(${task.id})">✏️</button>
+      <button onclick="markDone(${task.id})">✔️</button>
+      <button onclick="deleteTask(${task.id})">🗑</button>
+    </div>
+  `;
+
+  // מצב מורחב בלחיצה על הכרטיס (לא על הכפתורים)
+  card.addEventListener('click', e => {
+    if(e.target.tagName === 'BUTTON' || e.target.classList.contains('priority-indicator')) return;
+
+    const expanded = card.classList.toggle('expanded');
+    if(expanded){
+      card.querySelector('.task-info').innerHTML = `
+        <p class="task-title">${task.title}</p>
+        <p class="task-meta">${task.description}</p>
+        <p class="task-meta">סטטוס: ${task.status} | נוצר: ${task.createdBy}</p>
+        <p class="task-meta">תאריך יעד: ${task.dueDate || '-'}</p>
+        <p class="task-meta">עדכון אחרון: ${task.lastUpdatedBy} · ${task.lastUpdatedAt}</p>
+        <p class="task-meta">תגיות: ${task.tags.join(', ') || '-'}</p>
+      `;
+    } else {
+      card.querySelector('.task-info').innerHTML = `
+        <p class="task-title">${task.title}</p>
+        <p class="task-meta">עדכון אחרון: ${task.lastUpdatedBy} · ${task.lastUpdatedAt}</p>
+        <p class="task-meta">תאריך יעד: ${task.dueDate || '-'}</p>
+      `;
+    }
+  });
+
+  return card;
+}
+
+// --- הצגת משימות ---
 function renderTasks() {
   tasksDiv.innerHTML = '';
   highPriorityDiv.innerHTML = '';
   mediumPriorityDiv.innerHTML = '';
   lowPriorityDiv.innerHTML = '';
 
-  tasks.forEach(task => {
-    const card = document.createElement('div');
-    card.classList.add('task-card');
+  // --- מיון ---
+  const sortBy = sortBySelect.value;
+  let sortedTasks = [...tasks];
+  sortedTasks.sort((a,b) => {
+    if(sortBy === 'priority') return b.priority - a.priority;
+    if(sortBy === 'dueDate') return (a.dueDate || '') > (b.dueDate || '') ? 1 : -1;
+    if(sortBy === 'status') return a.status.localeCompare(b.status);
+    return a.createdAt < b.createdAt ? 1 : -1;
+  });
 
-    let color = '#66cc66';
-    if(task.priority == 2) color = '#ffcc00';
-    else if(task.priority == 3) color = '#ff4d4d';
+  // --- פילטר ---
+  const statusVal = statusFilter.value;
+  const priorityVal = priorityFilter.value;
+  if(statusVal) sortedTasks = sortedTasks.filter(t => t.status === statusVal);
+  if(priorityVal) sortedTasks = sortedTasks.filter(t => t.priority == priorityVal);
 
-    // תוכן מצומצם כברירת מחדל
-    card.innerHTML = `
-      <div class="task-info">
-        <p class="task-title">${task.title}</p>
-        <p class="task-meta">עדכון אחרון: ${task.lastUpdatedBy} · ${task.lastUpdatedAt}</p>
-        <p class="task-meta">תאריך יעד: ${task.dueDate || '-'}</p>
-      </div>
-      <div>
-        <span class="priority-indicator" style="background:${color}"></span>
-        <button onclick="editTask(${task.id})">✏️</button>
-        <button onclick="markDone(${task.id})">✔️</button>
-        <button onclick="deleteTask(${task.id})">🗑</button>
-      </div>
-    `;
+  // --- הגבלת תצוגה ---
+  const tasksToRender = sortedTasks.slice(0, tasksToShow);
 
-    // מצב מורחב בלחיצה על הכרטיס (לא על הכפתורים)
-    card.addEventListener('click', e => {
-      if(e.target.tagName === 'BUTTON' || e.target.classList.contains('priority-indicator')) return;
-
-      const expanded = card.classList.toggle('expanded');
-      if(expanded){
-        card.querySelector('.task-info').innerHTML = `
-          <p class="task-title">${task.title}</p>
-          <p class="task-meta">${task.description}</p>
-          <p class="task-meta">סטטוס: ${task.status} | נוצר: ${task.createdBy}</p>
-          <p class="task-meta">תאריך יעד: ${task.dueDate || '-'}</p>
-          <p class="task-meta">עדכון אחרון: ${task.lastUpdatedBy} · ${task.lastUpdatedAt}</p>
-          <p class="task-meta">תגיות: ${task.tags.join(', ') || '-'}</p>
-        `;
-      } else {
-        card.querySelector('.task-info').innerHTML = `
-          <p class="task-title">${task.title}</p>
-          <p class="task-meta">עדכון אחרון: ${task.lastUpdatedBy} · ${task.lastUpdatedAt}</p>
-          <p class="task-meta">תאריך יעד: ${task.dueDate || '-'}</p>
-        `;
-      }
-    });
-
+  tasksToRender.forEach(task => {
+    const card = createTaskCard(task);
     tasksDiv.appendChild(card);
 
     if(task.priority === 3) highPriorityDiv.appendChild(card.cloneNode(true));
@@ -166,24 +196,30 @@ function renderTasks() {
   });
 }
 
-function markDone(id){
-  tasks = tasks.map(t => { if(t.id === id) t.status = 'done'; return t; });
-  localStorage.setItem('tasks', JSON.stringify(tasks));
-  renderTasks();
+// --- פונקציות CRUD ---
+function markDone(id){ 
+  tasks = tasks.map(t => { if(t.id === id) t.status='done'; return t; }); 
+  localStorage.setItem('tasks', JSON.stringify(tasks)); 
+  renderTasks(); 
 }
 
-function deleteTask(id){
-  if(!confirm('למחוק משימה?')) return;
-  tasks = tasks.filter(t => t.id !== id);
-  localStorage.setItem('tasks', JSON.stringify(tasks));
-  renderTasks();
+function deleteTask(id){ 
+  if(!confirm('למחוק משימה?')) return; 
+  tasks = tasks.filter(t => t.id !== id); 
+  localStorage.setItem('tasks', JSON.stringify(tasks)); 
+  renderTasks(); 
 }
 
-function editTask(id){
-  const task = tasks.find(t => t.id === id);
-  if(task) openModal(task);
+function editTask(id){ 
+  const task = tasks.find(t => t.id===id); 
+  if(task) openModal(task); 
 }
 
+// --- מאזינים לפילטר ומיון ---
+statusFilter.onchange = priorityFilter.onchange = sortBySelect.onchange = () => renderTasks();
+showMoreBtn.onclick = () => { tasksToShow += 10; renderTasks(); };
+
+// הפעלה ראשונית
 renderTasks();
 
 };
