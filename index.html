@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+  <meta charset="UTF-8" />
+  <title>ניהול משימות הבית</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <h1>🏠 ניהול משימות הבית</h1>
+
+  <section id="task-form">
+    <h2>הוספת משימה חדשה</h2>
+
+    <input type="text" id="title" placeholder="שם המשימה" />
+
+    <textarea id="description" placeholder="תיאור"></textarea>
+
+    <select id="priority">
+      <option value="3">🔴 גבוהה</option>
+      <option value="2">🟡 בינונית</option>
+      <option value="1">🟢 נמוכה</option>
+    </select>
+
+    <select id="status">
+      <option value="open">פתוחה</option>
+      <option value="in-progress">בטיפול</option>
+      <option value="done">בוצעה</option>
+    </select>
+
+    <select id="createdBy">
+      <option value="שמי">שמי</option>
+      <option value="שירן">שירן</option>
+    </select>
+
+    <button id="addTask">הוסף משימה</button>
+  </section>
+
+  <section id="task-list">
+    <h2>רשימת משימות</h2>
+    <div id="tasks"></div>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>
