@@ -9,11 +9,12 @@
 
   <header>
     <h1>🏠 Dashboard משימות הבית</h1>
+    <button id="open-task-form" class="small-btn">➕ משימה חדשה</button>
   </header>
 
   <section id="dashboard-panels">
 
-    <!-- Panel 1: משימות לפי עדיפות -->
+    <!-- Panel: משימות לפי עדיפות -->
     <div class="panel" id="priority-dashboard">
       <h2>משימות אחרונות לפי עדיפות</h2>
       <div class="priority-block" id="high-priority">
@@ -30,16 +31,41 @@
       </div>
     </div>
 
-    <!-- Panel 2: יצירת משימה חדשה -->
-    <div class="panel" id="new-task-panel">
-      <h2>➕ צור משימה חדשה</h2>
-      <button id="open-task-form">לפתיחת טופס יצירה</button>
-    </div>
-
-    <!-- Panel 3: כל המשימות בכרטיסיות -->
+    <!-- Panel: כל המשימות עם פילטר ומיון -->
     <div class="panel" id="all-tasks-panel">
       <h2>📋 כל המשימות</h2>
+
+      <div id="filters">
+        <label>סטטוס:
+          <select id="statusFilter">
+            <option value="">הכל</option>
+            <option value="open">פתוחה</option>
+            <option value="in-progress">בטיפול</option>
+            <option value="done">בוצעה</option>
+          </select>
+        </label>
+
+        <label>עדיפות:
+          <select id="priorityFilter">
+            <option value="">הכל</option>
+            <option value="3">🔴 גבוהה</option>
+            <option value="2">🟡 בינונית</option>
+            <option value="1">🟢 נמוכה</option>
+          </select>
+        </label>
+
+        <label>מיון לפי:
+          <select id="sortBy">
+            <option value="createdAt">תאריך יצירה</option>
+            <option value="dueDate">תאריך יעד</option>
+            <option value="priority">עדיפות</option>
+            <option value="status">סטטוס</option>
+          </select>
+        </label>
+      </div>
+
       <div id="tasks"></div>
+      <button id="showMoreTasks">הראה עוד</button>
     </div>
 
   </section>
