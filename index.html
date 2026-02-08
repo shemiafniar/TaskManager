@@ -2,69 +2,81 @@
 <html lang="he">
 <head>
   <meta charset="UTF-8">
-  <title>ניהול משימות הבית</title>
+  <title>🏠 Dashboard משימות הבית</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <h1>🏠 ניהול משימות הבית</h1>
+  <header>
+    <h1>🏠 Dashboard משימות הבית</h1>
+  </header>
 
-  <section id="task-form">
-    <h2>הוספת משימה חדשה</h2>
+  <section id="dashboard-panels">
 
-    <input type="text" id="title" placeholder="שם המשימה" />
-    <textarea id="description" placeholder="תיאור"></textarea>
+    <!-- Panel 1: משימות לפי עדיפות -->
+    <div class="panel" id="priority-dashboard">
+      <h2>משימות אחרונות לפי עדיפות</h2>
+      <div class="priority-block" id="high-priority">
+        <h3>🔴 גבוהה</h3>
+        <div class="tasks-container"></div>
+      </div>
+      <div class="priority-block" id="medium-priority">
+        <h3>🟡 בינונית</h3>
+        <div class="tasks-container"></div>
+      </div>
+      <div class="priority-block" id="low-priority">
+        <h3>🟢 נמוכה</h3>
+        <div class="tasks-container"></div>
+      </div>
+    </div>
 
-    <select id="priority">
-      <option value="3">🔴 גבוהה</option>
-      <option value="2">🟡 בינונית</option>
-      <option value="1">🟢 נמוכה</option>
-    </select>
+    <!-- Panel 2: יצירת משימה חדשה -->
+    <div class="panel" id="new-task-panel">
+      <h2>➕ צור משימה חדשה</h2>
+      <button id="open-task-form">לפתיחת טופס יצירה</button>
+    </div>
 
-    <select id="status">
-      <option value="open">פתוחה</option>
-      <option value="in-progress">בטיפול</option>
-      <option value="done">בוצעה</option>
-    </select>
+    <!-- Panel 3: כל המשימות בכרטיסיות -->
+    <div class="panel" id="all-tasks-panel">
+      <h2>📋 כל המשימות</h2>
+      <div id="tasks"></div>
+    </div>
 
-    <select id="createdBy">
-      <option value="שמי">שמי</option>
-      <option value="שירן">שירן</option>
-    </select>
-
-    <input type="text" id="tags" placeholder="תגיות (מופרדות בפסיקים)" />
-
-    <button id="addTask">הוסף משימה</button>
   </section>
 
-  <section id="task-filters">
-    <h2>פילטרים ומיון</h2>
-    <select id="filterStatus">
-      <option value="all">כל הסטטוסים</option>
-      <option value="open">פתוחה</option>
-      <option value="in-progress">בטיפול</option>
-      <option value="done">בוצעה</option>
-    </select>
+  <!-- Modal ליצירה/עריכה -->
+  <div id="task-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2 id="modal-title">יצירת משימה</h2>
 
-    <select id="filterCreator">
-      <option value="all">כל היוצרים</option>
-      <option value="שמי">שמי</option>
-      <option value="שירן">שירן</option>
-    </select>
+      <input type="text" id="title" placeholder="שם המשימה" />
+      <textarea id="description" placeholder="תיאור"></textarea>
 
-    <input type="text" id="filterTag" placeholder="חפש לפי תגית" />
+      <input type="date" id="dueDate" />
 
-    <select id="sortBy">
-      <option value="priority">מיון לפי עדיפות</option>
-      <option value="createdAt">מיון לפי תאריך יצירה</option>
-      <option value="lastUpdated">מיון לפי עדכון אחרון</option>
-    </select>
-  </section>
+      <select id="priority">
+        <option value="3">🔴 גבוהה</option>
+        <option value="2">🟡 בינונית</option>
+        <option value="1">🟢 נמוכה</option>
+      </select>
 
-  <section id="task-list">
-    <h2>רשימת משימות</h2>
-    <div id="tasks"></div>
-  </section>
+      <select id="status">
+        <option value="open">פתוחה</option>
+        <option value="in-progress">בטיפול</option>
+        <option value="done">בוצעה</option>
+      </select>
+
+      <select id="createdBy">
+        <option value="שמי">שמי</option>
+        <option value="שירן">שירן</option>
+      </select>
+
+      <input type="text" id="tags" placeholder="תגיות (מופרדות בפסיקים)" />
+
+      <button id="saveTask">שמור משימה</button>
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>
