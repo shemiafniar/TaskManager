@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="he">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>ניהול משימות הבית</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -13,7 +13,6 @@
     <h2>הוספת משימה חדשה</h2>
 
     <input type="text" id="title" placeholder="שם המשימה" />
-
     <textarea id="description" placeholder="תיאור"></textarea>
 
     <select id="priority">
@@ -33,7 +32,33 @@
       <option value="שירן">שירן</option>
     </select>
 
+    <input type="text" id="tags" placeholder="תגיות (מופרדות בפסיקים)" />
+
     <button id="addTask">הוסף משימה</button>
+  </section>
+
+  <section id="task-filters">
+    <h2>פילטרים ומיון</h2>
+    <select id="filterStatus">
+      <option value="all">כל הסטטוסים</option>
+      <option value="open">פתוחה</option>
+      <option value="in-progress">בטיפול</option>
+      <option value="done">בוצעה</option>
+    </select>
+
+    <select id="filterCreator">
+      <option value="all">כל היוצרים</option>
+      <option value="שמי">שמי</option>
+      <option value="שירן">שירן</option>
+    </select>
+
+    <input type="text" id="filterTag" placeholder="חפש לפי תגית" />
+
+    <select id="sortBy">
+      <option value="priority">מיון לפי עדיפות</option>
+      <option value="createdAt">מיון לפי תאריך יצירה</option>
+      <option value="lastUpdated">מיון לפי עדכון אחרון</option>
+    </select>
   </section>
 
   <section id="task-list">
